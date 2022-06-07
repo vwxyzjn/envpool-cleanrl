@@ -15,8 +15,8 @@ AutoROM = {version = "^0.4.2", extras = ["accept-rom-license"]}
 tensorboard = "2.8.0"
 torch = "^1.11.0"
 protobuf = "<=4"
-numpy = "1.21.5"
 opencv-python = "^4.5.5"
+wandb = "^0.12.17"
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.19.0"
