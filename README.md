@@ -12,11 +12,17 @@ If you like this repo, consider checking out CleanRL (https://github.com/vwxyzjn
 
 Prerequisites:
 * Python 3.9+
-* [Poetry](https://python-poetry.org)
+* [Poetry 1.2+](https://python-poetry.org)
 
 Install dependencies:
 ```
 poetry install
+```
+
+By default, the `torch` wheel is built with CUDA 10.2. If you are using newer NVIDIA GPU (e.g., 3060 TI), you may need to specifically install CUDA 11.3 wheels by overriding the `torch` dependency with `pip`:
+
+```
+poetry run pip install "torch==1.12.1" --upgrade --extra-index-url https://download.pytorch.org/whl/cu113
 ```
 
 
