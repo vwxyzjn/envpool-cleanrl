@@ -113,11 +113,16 @@ for env_id in env_ids:
     ax.yaxis.set_label_text("")
     
 
+"Name","_wandb","Inference Time (Average)","Training Time (Average)","Environment Step Time (Average)","Iteration Time (Average)"
+"BreakoutNoFrameskip-v4__ppo_atari_stats__1__1660164074 (For-loop)","","0.14402471482753754","0.10691894590854643","0.9387586116790771","1.2547063827514648"
+"BreakoutNoFrameskip-v4__ppo_atari_stats__1__1660157833 (Subprocess)","","0.1728239804506302","0.11378822475671768","0.2818893492221832","0.6351382732391357"
+"Breakout-v5__ppo_atari_envpool_stats__1__1660153021 (EnvPool (sync))","","0.16654178500175476","0.11051245033740996","0.14515404403209686","0.48907411098480225"
+
 labels = ['For-loop', 'Subprocess', 'EnvPool (Sync)']
-environment_time_means = np.array([1.0135670900344849, 0.3469454348087311, 0.19825412333011627])
-inference_time_means = np.array([0.15798313915729523, 0.1825909912586212, 0.1951054036617279])
-training_time_means = np.array([0.11033231765031816, 0.11766397207975388, 0.11970197409391405])
-iteration_time_means = np.array([1.348467469215393, 0.7159662842750549, 0.585216760635376])
+environment_time_means = np.array([0.9387586116790771, 0.2818893492221832, 0.14515404403209686])
+inference_time_means = np.array([0.14402471482753754, 0.1728239804506302, 0.16654178500175476])
+training_time_means = np.array([0.10691894590854643, 0.11378822475671768, 0.11051245033740996])
+iteration_time_means = np.array([1.2547063827514648, 0.6351382732391357, 0.48907411098480225])
 other_time_means = iteration_time_means - (environment_time_means + training_time_means + inference_time_means)
 print(other_time_means)
 
@@ -137,5 +142,5 @@ ax.barh(y=labels, width=other_time_means, height=0.45, left=environment_time_mea
 fig.legend(h, l, loc='lower right', ncol=1, bbox_to_anchor=(0.9, -0.4))
 h, l = ax.get_legend_handles_labels()
 fig.legend(h, l, loc='lower left', ncol=2, bbox_to_anchor=(0.07, -0.3))
-plt.savefig("test.png",  bbox_inches='tight')
-plt.savefig("test.pdf",  bbox_inches='tight')
+plt.savefig("profile_plot.png",  bbox_inches='tight')
+plt.savefig("profile_plot.pdf",  bbox_inches='tight')
