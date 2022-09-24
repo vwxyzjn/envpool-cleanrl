@@ -17,6 +17,8 @@ torch = "^1.11.0"
 protobuf = "<=4"
 opencv-python = "^4.5.5"
 wandb = "^0.12.17"
+tueplots = {version = "^0.0.4", optional = true}
+expt = {git = "https://github.com/wookayin/expt.git", optional = true}
 
 [tool.poetry.dev-dependencies]
 pre-commit = "^2.19.0"
@@ -24,3 +26,6 @@ pre-commit = "^2.19.0"
 [build-system]
 requires = ["poetry-core>=1.0.0"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry.extras]
+plotting = ["tueplots", "expt"]
