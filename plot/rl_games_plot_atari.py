@@ -24,8 +24,8 @@ def create_hypothesis(name, wandb_runs):
     return Hypothesis(name, runs)
 
 
-env_ids = ["Walker2d-v4", "HalfCheetah-v4", "Ant-v4", "Humanoid-v4"]
-nrows = 2
+env_ids = ["Pong-v5", "Breakout-v5"]
+nrows = 1
 ncols = 4
 plt.rcParams.update(bundles.neurips2022())
  
@@ -44,10 +44,16 @@ for env_idx, env_id in enumerate(env_ids):
     )
     h = create_hypothesis("rl_games' PPO + EnvPool", wandb_runs)
     ex.add_hypothesis(h)
-    wandb_runs = api.runs(
-        path="openrlbenchmark/rl_games",
-        filters={"$and": [{"config.params.value.config.env_config.name": env_id}, {"config.params.value.config.num_actors": 64}]},
-    )
+    if env_id == "Breakout-v5":
+        wandb_runs = api.runs(
+            path="openrlbenchmark/rl_games",
+            filters={"$and": [{"config.params.value.config.env_config.name": env_id.replace("-v5", "NoFrameskip-v4")}, {"config.params.value.config.num_actors": 64}]},
+        )
+    else:
+        wandb_runs = api.runs(
+            path="openrlbenchmark/rl_games",
+            filters={"$and": [{"config.params.value.config.env_config.env_name": env_id.replace("-v5", "NoFrameskip-v4")}, {"config.params.value.config.num_actors": 64}]},
+        )
     h = create_hypothesis("rl_games' PPO + ray's vecenv", wandb_runs)
     ex.add_hypothesis(h)
 
@@ -99,6 +105,6 @@ for env_idx, env_id in enumerate(env_ids):
     ax.yaxis.set_label_text("")
 
 
-fig.legend(h, l, loc='lower right', ncol=2, bbox_to_anchor=(0.75, -0.10))
-plt.savefig("rl_games_plot.png",  bbox_inches='tight')
-plt.savefig("rl_games_plot.pdf",  bbox_inches='tight')
+fig.legend(h, l, loc='lower right', ncol=2, bbox_to_anchor=(0.75, -0.2))
+plt.savefig("rl_games_plot_atari.png",  bbox_inches='tight')
+plt.savefig("rl_games_plot_atari.pdf",  bbox_inches='tight')

@@ -49,9 +49,9 @@ for env_id in env_ids:
     ex = expt.Experiment("Comparison of PPO")
     wandb_runs = api.runs(
         path="openrlbenchmark/envpool-cleanrl",
-        filters={"$and": [{"config.env_id.value": env_id.replace("-v5", "NoFrameskip-v4")}, {"config.exp_name.value": "ppo_atari"}]},
+        filters={"$and": [{"config.env_id.value": env_id}, {"config.exp_name.value": "ppo_atari_envpool"}]},
     )
-    h = create_hypothesis("CleanRL's PPO + For-loop", wandb_runs)
+    h = create_hypothesis("CleanRL's PPO + EnvPool (Sync)", wandb_runs)
     ex.add_hypothesis(h)
     wandb_runs = api.runs(
         path="costa-huang/cleanrl-ppo-subprocess",
@@ -61,9 +61,9 @@ for env_id in env_ids:
     ex.add_hypothesis(h)
     wandb_runs = api.runs(
         path="openrlbenchmark/envpool-cleanrl",
-        filters={"$and": [{"config.env_id.value": env_id}, {"config.exp_name.value": "ppo_atari_envpool"}]},
+        filters={"$and": [{"config.env_id.value": env_id.replace("-v5", "NoFrameskip-v4")}, {"config.exp_name.value": "ppo_atari"}]},
     )
-    h = create_hypothesis("CleanRL's PPO + EnvPool (Sync)", wandb_runs)
+    h = create_hypothesis("CleanRL's PPO + For-loop", wandb_runs)
     ex.add_hypothesis(h)
 
 

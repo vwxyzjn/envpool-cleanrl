@@ -24,12 +24,12 @@ def create_hypothesis(name, wandb_runs):
     return Hypothesis(name, runs)
 
 
-env_ids = ["Walker2d-v4", "HalfCheetah-v4", "Ant-v4", "Humanoid-v4"]
-nrows = 2
-ncols = 4
+env_ids = ["HalfCheetah-v3"]
+nrows = 1
+ncols = 2
 plt.rcParams.update(bundles.neurips2022())
  
-plt.rcParams.update(figsizes.neurips2022(rel_width=1.2, nrows=nrows, ncols=ncols, height_to_width_ratio=0.9))
+plt.rcParams.update(figsizes.neurips2022(rel_width=0.6, nrows=nrows, ncols=ncols, height_to_width_ratio=0.9))
 fig, axes = plt.subplots(
     nrows=nrows,
     ncols=ncols,
@@ -39,16 +39,22 @@ fig, axes = plt.subplots(
 for env_idx, env_id in enumerate(env_ids):
     ex = expt.Experiment("Comparison of PPO")
     wandb_runs = api.runs(
-        path="openrlbenchmark/rl_games",
-        filters={"$and": [{"config.params.value.config.env_config.env_name": env_id}, {"config.params.value.config.num_actors": 64}]},
+        path="openrlbenchmark/acme",
+        filters={"$and": [{"config.env_name.value": env_id}, {"config.num_envs.value": 32}, {"config.use_envpool.value": True}]},
     )
-    h = create_hypothesis("rl_games' PPO + EnvPool", wandb_runs)
+    h = create_hypothesis("ACME's PPO + EnvPool w/ $N=32$", wandb_runs)
     ex.add_hypothesis(h)
     wandb_runs = api.runs(
-        path="openrlbenchmark/rl_games",
-        filters={"$and": [{"config.params.value.config.env_config.name": env_id}, {"config.params.value.config.num_actors": 64}]},
+        path="openrlbenchmark/acme",
+        filters={"$and": [{"config.env_name.value": env_id}, {"config.num_envs.value": 8}, {"config.use_envpool.value": True}]},
     )
-    h = create_hypothesis("rl_games' PPO + ray's vecenv", wandb_runs)
+    h = create_hypothesis("ACME's PPO + EnvPool w/ $N=8$", wandb_runs)
+    ex.add_hypothesis(h)
+    wandb_runs = api.runs(
+        path="openrlbenchmark/acme",
+        filters={"$and": [{"config.env_name.value": env_id}, {"config.num_envs.value": 4}, {"config.use_envpool.value": True}]},
+    )
+    h = create_hypothesis("ACME's PPO + EnvPool w/ $N=4$", wandb_runs)
     ex.add_hypothesis(h)
 
 
@@ -57,7 +63,7 @@ for env_idx, env_id in enumerate(env_ids):
         ax=ax,
         title=env_id,
         x="global_step",
-        y="rewards/step",
+        y="episode_return",
         err_style="band",
         std_alpha=0.1,
         rolling=50,
@@ -65,10 +71,10 @@ for env_idx, env_id in enumerate(env_ids):
         legend=False,
         tight_layout=False,
         suptitle=False,
-        colors=["#1f77b4", "#ff7f0e"],
+        colors=["#1f77b4", "#ff7f0e", "#d62728"],
     )
     # ax.set_title("")
-    ax.xaxis.set_label_text("Frames")
+    ax.xaxis.set_label_text("Steps")
     if env_idx == 0:
         ax.yaxis.set_label_text("Episodic Return")
     else:
@@ -84,7 +90,7 @@ for env_idx, env_id in enumerate(env_ids):
         ax=ax,
         # title=env_id,
         x="_runtime",
-        y="rewards/step",
+        y="episode_return",
         err_style="band",
         std_alpha=0.1,
         rolling=50,
@@ -92,13 +98,13 @@ for env_idx, env_id in enumerate(env_ids):
         legend=False,
         tight_layout=False,
         suptitle=False,
-        colors=["#1f77b4", "#ff7f0e"],
+        colors=["#1f77b4", "#ff7f0e", "#d62728"],
     )
     ax.set_title("")
     ax.xaxis.set_label_text("Runtime (minutes)")
     ax.yaxis.set_label_text("")
 
 
-fig.legend(h, l, loc='lower right', ncol=2, bbox_to_anchor=(0.75, -0.10))
-plt.savefig("rl_games_plot.png",  bbox_inches='tight')
-plt.savefig("rl_games_plot.pdf",  bbox_inches='tight')
+fig.legend(h, l, loc='lower right', ncol=2, bbox_to_anchor=(1.1, -0.23))
+plt.savefig("acme_plot_different_num_envs.png",  bbox_inches='tight')
+plt.savefig("acme_plot_different_num_envs.pdf",  bbox_inches='tight')

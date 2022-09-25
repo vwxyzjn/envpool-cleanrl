@@ -19,13 +19,14 @@ def create_hypothesis(name, wandb_runs):
         if "videos" in wandb_run:
             wandb_run = wandb_run.drop(columns=["videos"], axis=1)
         wandb_run["_runtime"] /= 60  # convert to minutes
+        wandb_run["global_step"] *= 4 # convert to frames
 
         runs += [Run(f"seed{idx}", wandb_run)]
     return Hypothesis(name, runs)
 
 
-env_ids = ["Walker2d-v4", "HalfCheetah-v4", "Ant-v4", "Humanoid-v4"]
-nrows = 2
+env_ids = ["Pong-v5", "Breakout-v5"]
+nrows = 1
 ncols = 4
 plt.rcParams.update(bundles.neurips2022())
  
@@ -39,16 +40,16 @@ fig, axes = plt.subplots(
 for env_idx, env_id in enumerate(env_ids):
     ex = expt.Experiment("Comparison of PPO")
     wandb_runs = api.runs(
-        path="openrlbenchmark/rl_games",
-        filters={"$and": [{"config.params.value.config.env_config.env_name": env_id}, {"config.params.value.config.num_actors": 64}]},
+        path="openrlbenchmark/envpool-cleanrl",
+        filters={"$and": [{"config.env_id.value": env_id}, {"config.exp_name.value": "ppo_atari_envpool"}, {"config.num_envs.value": 8}]},
     )
-    h = create_hypothesis("rl_games' PPO + EnvPool", wandb_runs)
+    h = create_hypothesis("CleanRL’s PPO + EnvPool (Sync)", wandb_runs)
     ex.add_hypothesis(h)
     wandb_runs = api.runs(
-        path="openrlbenchmark/rl_games",
-        filters={"$and": [{"config.params.value.config.env_config.name": env_id}, {"config.params.value.config.num_actors": 64}]},
+        path="openrlbenchmark/envpool-cleanrl",
+        filters={"$and": [{"config.env_id.value": env_id.replace("-v5", "NoFrameskip-v4")}, {"config.exp_name.value": "ppo_atari"}, {"config.num_envs.value": 8}]},
     )
-    h = create_hypothesis("rl_games' PPO + ray's vecenv", wandb_runs)
+    h = create_hypothesis("CleanRL’s PPO + For-loop", wandb_runs)
     ex.add_hypothesis(h)
 
 
@@ -57,7 +58,7 @@ for env_idx, env_id in enumerate(env_ids):
         ax=ax,
         title=env_id,
         x="global_step",
-        y="rewards/step",
+        y="charts/episodic_return",
         err_style="band",
         std_alpha=0.1,
         rolling=50,
@@ -84,7 +85,7 @@ for env_idx, env_id in enumerate(env_ids):
         ax=ax,
         # title=env_id,
         x="_runtime",
-        y="rewards/step",
+        y="charts/episodic_return",
         err_style="band",
         std_alpha=0.1,
         rolling=50,
@@ -99,6 +100,6 @@ for env_idx, env_id in enumerate(env_ids):
     ax.yaxis.set_label_text("")
 
 
-fig.legend(h, l, loc='lower right', ncol=2, bbox_to_anchor=(0.75, -0.10))
-plt.savefig("rl_games_plot.png",  bbox_inches='tight')
-plt.savefig("rl_games_plot.pdf",  bbox_inches='tight')
+fig.legend(h, l, loc='lower right', ncol=2, bbox_to_anchor=(0.75, -0.2))
+plt.savefig("cleanrl_plot_atari.png",  bbox_inches='tight')
+plt.savefig("cleanrl_plot_atari.pdf",  bbox_inches='tight')
